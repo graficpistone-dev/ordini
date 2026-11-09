@@ -109,6 +109,8 @@ label{font:600 12px var(--fb);color:var(--ink2);display:block;margin-bottom:6px;
 .crumb{font:700 11px var(--fd);letter-spacing:.16em;text-transform:uppercase;color:var(--ink2)}
 .phead{margin-bottom:22px} .phead h1{font:700 27px/1.2 var(--fd);letter-spacing:-.5px;margin-top:6px}
 .pdot{width:9px;height:9px;border-radius:3px;display:inline-block;flex:none}
+.descbox{background:#f7f8f9;border:1px dashed #d3d8dd;border-radius:10px;padding:12px 14px;margin-top:8px;font-size:13px;color:var(--ink2);line-height:1.6}
+.descbox b{color:var(--ink)}
 
 /* ── login ────────────────────────────────── */
 .login{min-height:100vh;display:grid;grid-template-columns:minmax(360px,470px) 1fr;position:relative;z-index:1}
@@ -230,6 +232,7 @@ input[type=color]::-webkit-color-swatch{border:2px solid #fff;box-shadow:0 0 0 1
 .prw-t{display:flex;flex-direction:column;gap:2px} .prw-t b{font-size:14px}
 .pedit-head{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
 .pedit-head .frow{margin:0} .pedit-head .grow{flex:1;min-width:190px}
+.pedit-head .full{width:100%}
 .pedit-acts{display:flex;gap:8px;margin-left:auto}
 .sec{font:700 15px var(--fd);margin:26px 0 12px;display:flex;gap:9px;align-items:center}
 .sec i{color:var(--teal)}
@@ -401,7 +404,7 @@ function seed(){
     macro:[{id:ma1,nome:'Stampa digitale',colore:'#3D7BF5'},{id:ma2,nome:'Grande formato',colore:'#E8863A'}],
     micro:[{id:mi1,nome:'Biglietti da visita',macroId:ma1},{id:mi2,nome:'Volantini e flyer',macroId:ma1},{id:mi3,nome:'Poster e manifesti',macroId:ma2}],
     prodotti:[
-      {id:uid(),codice:'BIG',nome:'Biglietti da visita',microId:mi1,domande:[
+      {id:uid(),codice:'BIG',nome:'Biglietti da visita',descrizione:'Bigliettini da visita f.to 85×55 mm',microId:mi1,domande:[
         D({testo:'Quantità',tipo:'numero',obbligatoria:true,unita:'pz'}),
         D({testo:'Tipologia carta',tipo:'scelta',obbligatoria:true,opzioni:opts(['Patinata lucida 300 g','Patinata opaca 350 g','Usomano 300 g','Carta perlescente 300 g'])}),
         D({testo:'Misura finita',tipo:'scelta',obbligatoria:true,conAltro:true,opzioni:opts(['85×55 mm','90×50 mm','55×55 mm (quadrato)'])}),
@@ -414,7 +417,7 @@ function seed(){
         D({testo:'Grafica',tipo:'scelta',obbligatoria:true,conAltro:true,opzioni:opts(['Fornita dal cliente','Da realizzare','Da archivio (ristampa)'])}),
         D({testo:'Note',tipo:'testo'})
       ]},
-      {id:uid(),codice:'VOL',nome:'Volantini',microId:mi2,domande:[
+      {id:uid(),codice:'VOL',nome:'Volantini',descrizione:'Volantini A5 f.to 14,8×21 cm',microId:mi2,domande:[
         D({testo:'Quantità',tipo:'numero',obbligatoria:true,unita:'pz'}),
         D({testo:'Formato',tipo:'scelta',obbligatoria:true,conAltro:true,opzioni:opts(['A6 · 10,5×14,8 cm','A5 · 14,8×21 cm','A4 · 21×29,7 cm'])}),
         D({testo:'Carta',tipo:'scelta',obbligatoria:true,opzioni:opts(['Patino 130 g','Patino 170 g','Patino 200 g','Usomano 140 g'])}),
@@ -422,7 +425,7 @@ function seed(){
         D({testo:'Colori',tipo:'scelta',obbligatoria:true,opzioni:opts(['Bianco e nero','4 colori (CMYK)'])}),
         D({testo:'Note',tipo:'testo'})
       ]},
-      {id:uid(),codice:'POS',nome:'Poster 70×100',microId:mi3,domande:[
+      {id:uid(),codice:'POS',nome:'Poster 70×100',descrizione:'Poster f.to 70×100 cm',microId:mi3,domande:[
         D({testo:'Quantità',tipo:'numero',obbligatoria:true,unita:'pz'}),
         D({testo:'Supporto',tipo:'scelta',obbligatoria:true,opzioni:opts(['Carta 150 g','TNT 120 g','PVC rigido'])}),
         D({testo:'Lato di stampa',tipo:'scelta',obbligatoria:true,opzioni:opts(['Solo fronte','Fronte/retro'])}),
@@ -433,10 +436,7 @@ function seed(){
 }
 function loadDb(){try{const r=localStorage.getItem(LS_DB);if(r){db=JSON.parse(r);return}}catch(e){}db=seed();saveDb()}
 
-/* ════════ CSV preset (formato senza virgolette) ════════
-   Il campo "dati" è URL-encoded: nessun carattere speciale nel file,
-   quindi anteprima GitHub sempre OK e zero corruzioni in Excel.
-   Legge comunque anche i vecchi CSV con JSON quotato. */
+/* ════════ CSV preset (formato senza virgolette) ════════ */
 function csvParse(text){
   const rows=[];let row=[],cur='',inQ=false;
   for(let i=0;i<text.length;i++){const c=text[i];
@@ -451,8 +451,8 @@ function csvCell(v){v=String(v??'');return /[";\n\r]/.test(v)?'"'+v.replace(/"/g
 const encDato=j=>encodeURIComponent(JSON.stringify(j));
 function parseDato(raw){
   if(!raw)return {};
-  try{return JSON.parse(raw)}catch(e){}                       // vecchio formato (JSON quotato)
-  try{return JSON.parse(decodeURIComponent(raw))}catch(e){}   // nuovo formato (URL-encoded)
+  try{return JSON.parse(raw)}catch(e){}
+  try{return JSON.parse(decodeURIComponent(raw))}catch(e){}
   return null;
 }
 function dbToCsv(d){
@@ -460,7 +460,7 @@ function dbToCsv(d){
   (d.operatori||[]).forEach((o,i)=>rows.push(['OPERATORE',o.id,'',i,encDato({nome:o.nome,cognome:o.cognome||'',emoji:o.emoji||'',colore:o.colore||''})]));
   (d.macro||[]).forEach((m,i)=>rows.push(['MACRO',m.id,'',i,encDato({nome:m.nome,colore:m.colore||''})]));
   (d.micro||[]).forEach((m,i)=>rows.push(['MICRO',m.id,m.macroId||'',i,encDato({nome:m.nome})]));
-  (d.prodotti||[]).forEach((p,i)=>rows.push(['PRODOTTO',p.id,p.microId||'',i,encDato({codice:p.codice,nome:p.nome,domande:p.domande})]));
+  (d.prodotti||[]).forEach((p,i)=>rows.push(['PRODOTTO',p.id,p.microId||'',i,encDato({codice:p.codice,nome:p.nome,descrizione:p.descrizione||'',domande:p.domande})]));
   return rows.map(r=>r.map(csvCell).join(';')).join('\r\n')+'\r\n';
 }
 function csvToDb(text){
@@ -475,7 +475,7 @@ function csvToDb(text){
       else if(tipo==='OPERATORE')d.operatori.push({id:r[1],nome:j.nome||'',cognome:j.cognome||'',emoji:j.emoji||'',colore:j.colore||''});
       else if(tipo==='MACRO')d.macro.push({id:r[1],nome:j.nome||'',colore:j.colore||''});
       else if(tipo==='MICRO')d.micro.push({id:r[1],macroId:r[2],nome:j.nome||''});
-      else if(tipo==='PRODOTTO')d.prodotti.push({id:r[1],microId:r[2],codice:j.codice||'',nome:j.nome||'',domande:j.domande||[]});
+      else if(tipo==='PRODOTTO')d.prodotti.push({id:r[1],microId:r[2],codice:j.codice||'',nome:j.nome||'',descrizione:j.descrizione||'',domande:j.domande||[]});
     }
     d.meta={versione:d.meta.versione||nowStr(),lastBackup:null,lastPull:null};
     return d;
@@ -514,8 +514,8 @@ function mergeDb(loc,inc,confl){
     const ma=inc.macro.find(m=>m.id===mi.macroId)||{nome:'Generale'};
     const target=ensureMicro(ma.nome||'Generale',mi.nome||'Generale',ma.colore).id;
     const ci=confl?confl.idx.get(p):undefined;
-    if(ci===undefined){out.prodotti.push({id:uid(),codice:p.codice,nome:p.nome,microId:target,domande:clone(p.domande)})}
-    else if(confl.scelte[ci]==='inc'){const ex=out.prodotti.find(x=>norm(x.codice)===norm(p.codice));if(ex){ex.nome=p.nome;ex.domande=clone(p.domande);ex.microId=target}}
+    if(ci===undefined){out.prodotti.push({id:uid(),codice:p.codice,nome:p.nome,descrizione:p.descrizione||'',microId:target,domande:clone(p.domande)})}
+    else if(confl.scelte[ci]==='inc'){const ex=out.prodotti.find(x=>norm(x.codice)===norm(p.codice));if(ex){ex.nome=p.nome;ex.descrizione=p.descrizione||'';ex.domande=clone(p.domande);ex.microId=target}}
   }
   return out;
 }
@@ -745,7 +745,9 @@ function renderAns(q,r){
   return s;
 }
 function buildText(p){
+  const desc=String(p.descrizione||'').trim();
   const lines=[];
+  if(desc){lines.push(desc);lines.push('')}
   for(const q of p.domande){const a=renderAns(q,S.w.ris[q.id]);if(a===null)continue;lines.push((q.etichetta||q.testo)+': '+a)}
   const op=curOp();
   return lines.join('\n')+'\n\nCod. Operatore: '+(op?codiceOperatore(op):'—');
@@ -881,13 +883,14 @@ function selProd(id){S.prodSel=id;S.qEdit=null;render()}
 function addProd(){
   let mi=db.micro[0];
   if(!mi){const ma={id:uid(),nome:'Generale',colore:PALETTE[0]};db.macro.push(ma);mi={id:uid(),nome:'Generale',macroId:ma.id};db.micro.push(mi)}
-  const p={id:uid(),codice:'NUOVO',nome:'Nuovo prodotto',microId:mi.id,domande:[]};
+  const p={id:uid(),codice:'NUOVO',nome:'Nuovo prodotto',descrizione:'',microId:mi.id,domande:[]};
   db.prodotti.push(p);S.prodSel=p.id;S.qEdit=null;saveDb();render();
 }
 function saveProdHead(){
   const p=db.prodotti.find(x=>x.id===S.prodSel);if(!p)return;
   p.codice=$('#pCod').value.trim()||p.codice;
   p.nome=$('#pNome').value.trim()||p.nome;
+  p.descrizione=($('#pDesc')&&$('#pDesc').value.trim())||'';
   p.microId=$('#pMicro').value||p.microId;
   saveDb();render();
 }
@@ -916,7 +919,10 @@ function prodEditor(){
    +'<div class="frow grow"><label>Nome prodotto</label><input class="inp" id="pNome" value="'+esc(p.nome)+'" onchange="saveProdHead()"></div>'
    +'<div class="frow"><label>Categoria</label><select class="inp" id="pMicro" onchange="saveProdHead()">'+optsH+'</select></div>'
    +'<div class="pedit-acts"><button class="btn btn-gh" onclick="dupProd(\''+p.id+'\')"><i class="bi bi-files"></i> Duplica</button>'
-   +'<button class="btn btn-dng" title="Elimina prodotto" onclick="delProd(\''+p.id+'\')"><i class="bi bi-trash3"></i></button></div></div>'
+   +'<button class="btn btn-dng" title="Elimina prodotto" onclick="delProd(\''+p.id+'\')"><i class="bi bi-trash3"></i></button></div>'
+   +'<div class="frow full" style="margin-top:14px"><label><i class="bi bi-card-text"></i> Descrizione del prodotto · prima riga del testo da copiare</label>'
+   +'<input class="inp" id="pDesc" value="'+esc(p.descrizione||'')+'" placeholder="Es. Bigliettini da visita f.to 85×55 mm" onchange="saveProdHead()">'
+   +'<div class="descbox">Nel testo finale l’operatore troverà: <b>'+(esc(p.descrizione||'')||'(descrizione vuota)')+'</b> come prima riga, poi tutte le risposte e infine il codice operatore.</div></div></div>'
    +'<h3 class="sec"><i class="bi bi-patch-question"></i> Questionario <span class="mut">· '+p.domande.length+' domande</span></h3>'
    +(qrows||'<div class="empty small">Nessuna domanda: aggiungine una.</div>')
    +'<div style="margin-top:12px"><button class="btn btn-pr" onclick="openQ(\'new\')"><i class="bi bi-plus-lg"></i> Aggiungi domanda</button></div>'
@@ -1003,7 +1009,7 @@ function tSync(){
    +'<button class="btn btn-acc" onclick="exportPresetGh()"><i class="bi bi-github"></i> Scarica preset.csv (da caricare su GitHub)</button>'
    +'<label class="btn btn-pr filebtn"><i class="bi bi-upload"></i> Importa file CSV<input type="file" accept=".csv,text/csv" hidden onchange="onImportFile(this)"></label>'
    +'<button class="btn btn-gh" onclick="exportAll()"><i class="bi bi-download"></i> Backup completo (con data e ora)</button></div>'
-   +'<p class="hint">Il CSV viene scritto <b>senza virgolette</b>: l’anteprima di GitHub lo mostra sempre come tabella e non può corrompersi. Include tutto: operatori (emoji e colori), categorie, prodotti e domande.</p>'
+   +'<p class="hint">Il CSV viene scritto <b>senza virgolette</b>: l’anteprima di GitHub lo mostra sempre come tabella e non può corrompersi. Include tutto: operatori (emoji e colori), categorie, prodotti (con descrizione) e domande.</p>'
    +'<p class="hint lastbk"><i class="bi bi-clock-history"></i> Ultimo backup: <b>'+(db.meta.lastBackup?fmtTs(db.meta.lastBackup):'mai effettuato')+'</b>'
    +(db.meta.lastPull?' · Ultimo scaricamento da GitHub: <b>'+fmtTs(db.meta.lastPull)+'</b>':'')+'</p></div>'
    +'<div class="card pad"><h3 class="sec" style="margin-top:0"><i class="bi bi-github"></i> Aggiornamento del team</h3>'
