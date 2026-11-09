@@ -10,6 +10,9 @@
   3. Apri https://TUO-UTENTE.github.io/NOME-REPO/
   4. Per aggiornare il team: modifica/importa nell'app → "Scarica preset.csv"
      → carica il file nella repo su github.com sostituendo il precedente → Commit.
+
+  Il CSV è scritto SENZA virgolette (dati URL-encoded): l'anteprima di
+  GitHub lo mostra sempre come tabella e non può corrompersi in Excel.
 -->
 <html lang="it">
 <head>
@@ -367,7 +370,7 @@ function fmtTs(t){if(!t)return '—';const d=new Date(t);return pad(d.getDate())
 function dataOdierna(){const s=new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});return s[0].toUpperCase()+s.slice(1)}
 function codiceOperatore(op,d=new Date()){const iniz=((op.nome||'')[0]||'')+((op.cognome||'')[0]||'');return ('OP'+iniz+d.getDate()+pad(d.getMonth()+1)).toUpperCase()}
 function iniziali(op){return (((op.nome||'')[0]||'')+((op.cognome||'')[0]||'')).toUpperCase()||'?'}
-function download(name,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
+function download(name,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+text],{type:'text/csv;charset=utf-8'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
 function stamp(){const d=new Date();return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'_'+pad(d.getHours())+pad(d.getMinutes())}
 async function copiaTxt(t){try{await navigator.clipboard.writeText(t)}catch(e){const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove()}}
 function toast(msg,icon){icon=icon||'check2-circle';const d=document.createElement('div');d.className='toast';d.innerHTML='<i class="bi bi-'+icon+'"></i><span>'+msg+'</span>';$('#toasts').appendChild(d);setTimeout(()=>d.classList.add('out'),3000);setTimeout(()=>d.remove(),3550)}
@@ -430,7 +433,10 @@ function seed(){
 }
 function loadDb(){try{const r=localStorage.getItem(LS_DB);if(r){db=JSON.parse(r);return}}catch(e){}db=seed();saveDb()}
 
-/* ════════ CSV preset ════════ */
+/* ════════ CSV preset (formato senza virgolette) ════════
+   Il campo "dati" è URL-encoded: nessun carattere speciale nel file,
+   quindi anteprima GitHub sempre OK e zero corruzioni in Excel.
+   Legge comunque anche i vecchi CSV con JSON quotato. */
 function csvParse(text){
   const rows=[];let row=[],cur='',inQ=false;
   for(let i=0;i<text.length;i++){const c=text[i];
@@ -442,21 +448,29 @@ function csvParse(text){
   return rows.filter(r=>r.some(c=>c!==''));
 }
 function csvCell(v){v=String(v??'');return /[";\n\r]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}
+const encDato=j=>encodeURIComponent(JSON.stringify(j));
+function parseDato(raw){
+  if(!raw)return {};
+  try{return JSON.parse(raw)}catch(e){}                       // vecchio formato (JSON quotato)
+  try{return JSON.parse(decodeURIComponent(raw))}catch(e){}   // nuovo formato (URL-encoded)
+  return null;
+}
 function dbToCsv(d){
   const rows=[['tipo','id','rif','ord','dati'],['VERSIONE','','','',d.meta.versione||'']];
-  (d.operatori||[]).forEach((o,i)=>rows.push(['OPERATORE',o.id,'',i,JSON.stringify({nome:o.nome,cognome:o.cognome||'',emoji:o.emoji||'',colore:o.colore||''})]));
-  (d.macro||[]).forEach((m,i)=>rows.push(['MACRO',m.id,'',i,JSON.stringify({nome:m.nome,colore:m.colore||''})]));
-  (d.micro||[]).forEach((m,i)=>rows.push(['MICRO',m.id,m.macroId||'',i,JSON.stringify({nome:m.nome})]));
-  (d.prodotti||[]).forEach((p,i)=>rows.push(['PRODOTTO',p.id,p.microId||'',i,JSON.stringify({codice:p.codice,nome:p.nome,domande:p.domande})]));
+  (d.operatori||[]).forEach((o,i)=>rows.push(['OPERATORE',o.id,'',i,encDato({nome:o.nome,cognome:o.cognome||'',emoji:o.emoji||'',colore:o.colore||''})]));
+  (d.macro||[]).forEach((m,i)=>rows.push(['MACRO',m.id,'',i,encDato({nome:m.nome,colore:m.colore||''})]));
+  (d.micro||[]).forEach((m,i)=>rows.push(['MICRO',m.id,m.macroId||'',i,encDato({nome:m.nome})]));
+  (d.prodotti||[]).forEach((p,i)=>rows.push(['PRODOTTO',p.id,p.microId||'',i,encDato({codice:p.codice,nome:p.nome,domande:p.domande})]));
   return rows.map(r=>r.map(csvCell).join(';')).join('\r\n')+'\r\n';
 }
 function csvToDb(text){
   try{
-    const rows=csvParse(String(text).trim());
+    const rows=csvParse(String(text).replace(/^\uFEFF/,'').trim());
     const d={operatori:[],macro:[],micro:[],prodotti:[],meta:{versione:''}};
     for(let i=1;i<rows.length;i++){
       const r=rows[i],tipo=r[0];if(!tipo)continue;
-      let j={};try{j=r[4]?JSON.parse(r[4]):{}}catch(e){continue}
+      const j=parseDato(r[4]);
+      if(j===null)continue;
       if(tipo==='VERSIONE')d.meta.versione=r[4]||'';
       else if(tipo==='OPERATORE')d.operatori.push({id:r[1],nome:j.nome||'',cognome:j.cognome||'',emoji:j.emoji||'',colore:j.colore||''});
       else if(tipo==='MACRO')d.macro.push({id:r[1],nome:j.nome||'',colore:j.colore||''});
@@ -989,7 +1003,7 @@ function tSync(){
    +'<button class="btn btn-acc" onclick="exportPresetGh()"><i class="bi bi-github"></i> Scarica preset.csv (da caricare su GitHub)</button>'
    +'<label class="btn btn-pr filebtn"><i class="bi bi-upload"></i> Importa file CSV<input type="file" accept=".csv,text/csv" hidden onchange="onImportFile(this)"></label>'
    +'<button class="btn btn-gh" onclick="exportAll()"><i class="bi bi-download"></i> Backup completo (con data e ora)</button></div>'
-   +'<p class="hint">L’export include tutto: operatori (con emoji e colori), categorie, prodotti e domande. Se all’import un prodotto ha già lo stesso codice, ti chiediamo quale conservare.</p>'
+   +'<p class="hint">Il CSV viene scritto <b>senza virgolette</b>: l’anteprima di GitHub lo mostra sempre come tabella e non può corrompersi. Include tutto: operatori (emoji e colori), categorie, prodotti e domande.</p>'
    +'<p class="hint lastbk"><i class="bi bi-clock-history"></i> Ultimo backup: <b>'+(db.meta.lastBackup?fmtTs(db.meta.lastBackup):'mai effettuato')+'</b>'
    +(db.meta.lastPull?' · Ultimo scaricamento da GitHub: <b>'+fmtTs(db.meta.lastPull)+'</b>':'')+'</p></div>'
    +'<div class="card pad"><h3 class="sec" style="margin-top:0"><i class="bi bi-github"></i> Aggiornamento del team</h3>'
