@@ -1,0 +1,7 @@
+tipo;id;rif;ord;dati
+VERSIONE;;;;2026-11-09 11:46
+OPERATORE;xztpee6qn;;0;"{""nome"":""Salvatore"",""cognome"":""Pistone""}"
+OPERATORE;xu0feznse;;1;"{""nome"":""Salvo"",""cognome"":""G""}"
+MACRO;xhltimdgn;;0;"{""nome"":""Tipografia""}"
+MICRO;x66a6prjl;xhltimdgn;0;"{""nome"":""Bigliettini da visita""}"
+PRODOTTO;x8pwthqyh;x66a6prjl;0;"{""codice"":""BV"",""nome"":""Bigliettini da visita"",""domande"":[{""testo"":""Quantità"",""etichetta"":""Quantità"",""tipo"":""multipla"",""obbligatoria"":true,""opzioni"":[{""id"":""xslk60y3z"",""valore"":""200 Pezzi"",""testoOut"":""Quantità: 200 pezzi""},{""id"":""xcx1vq5nw"",""valore"":""500 Pezzi"",""testoOut"":""Quantità: 500 pezzi""},{""id"":""xhrhiodh0"",""valore"":""1000 pezzi"",""testoOut"":""Quantità: 1000 pezzi""},{""id"":""xea78044d"",""valore"":""2000 pezzi"",""testoOut"":""Quantità: 2000 pezzi""}],""conAltro"":true,""siText"":""Sì"",""siTesto"":""Sì"",""noMode"":""salta"",""noTesto"":"""",""unita"":"""",""id"":""xjr9wf3ri""}]}"
