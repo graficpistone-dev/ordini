@@ -1,6 +1,15 @@
 tipo;id;rif;ord;dati
-VERSIONE;;;;2026-11-09 11:56
+VERSIONE;;;;2026-11-09 12:08
 OPERATORE;xu0feznse;;0;"{""nome"":""Salvo"",""cognome"":""G""}"
-MACRO;xhltimdgn;;0;"{""nome"":""Tipografia""}"
-MICRO;x66a6prjl;xhltimdgn;0;"{""nome"":""Bigliettini da visita""}"
-PRODOTTO;x8pwthqyh;x66a6prjl;0;"{""codice"":""BV"",""nome"":""Bigliettini da visita"",""domande"":[{""testo"":""Quantità"",""etichetta"":""Quantità"",""tipo"":""multipla"",""obbligatoria"":true,""opzioni"":[{""id"":""xslk60y3z"",""valore"":""200 Pezzi"",""testoOut"":""Quantità: 200 pezzi""},{""id"":""xcx1vq5nw"",""valore"":""500 Pezzi"",""testoOut"":""Quantità: 500 pezzi""},{""id"":""xhrhiodh0"",""valore"":""1000 pezzi"",""testoOut"":""Quantità: 1000 pezzi""},{""id"":""xea78044d"",""valore"":""2000 pezzi"",""testoOut"":""Quantità: 2000 pezzi""}],""conAltro"":true,""siText"":""Sì"",""siTesto"":""Sì"",""noMode"":""salta"",""noTesto"":"""",""unita"":"""",""id"":""xjr9wf3ri""}]}"
+OPERATORE;xxbwakdwb;;1;"{""nome"":""Alberto"",""cognome"":""Plano""}"
+OPERATORE;xsl0ro867;;2;"{""nome"":""Samuele"",""cognome"":""Corradengo""}"
+OPERATORE;x9sbe8fqn;;3;"{""nome"":""Pietro"",""cognome"":""Donzelli""}"
+OPERATORE;x29et6cae;;4;"{""nome"":""Giuseppe"",""cognome"":""Pistone""}"
+OPERATORE;xp5iilhai;;5;"{""nome"":""Salvatore"",""cognome"":""Pistone""}"
+OPERATORE;xie6r58lf;;6;"{""nome"":""Alessio"",""cognome"":""Marciante""}"
+OPERATORE;xxjvdw20u;;7;"{""nome"":""Sara"",""cognome"":""Candela""}"
+MACRO;xe5w36ior;;0;"{""nome"":""Litografia""}"
+MACRO;xrc4crk00;;1;"{""nome"":""Abbigliamento""}"
+MACRO;xnrfkk61e;;2;"{""nome"":""Digitale""}"
+MACRO;x3tutujo4;;3;"{""nome"":""Plotter""}"
+MACRO;x6ymmw1k0;;4;"{""nome"":""Insegne""}"
