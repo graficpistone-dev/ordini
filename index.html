@@ -2,14 +2,15 @@
 <!--
   GUIDA ORDINI CLIENTE
   ─────────────────────────────────────────────────────────────
-  Come pubblicarlo:
-  1. Crea una repository GitHub e caricala con questi 2 file nella STESSA cartella (radice):
+  Come pubblicarlo (solo file, nessun server, nessun token):
+  1. Crea una repository GitHub e carica nella STESSA cartella (radice):
        index.html   ← questo file
-       preset.csv   ← il file dei preset (te lo genera l'app con "Esporta tutto")
+       preset.csv   ← il file dei preset (generalo dall'app: Impostazioni → Scarica preset.csv)
   2. Settings → Pages → Source: "Deploy from a branch" → cartella root → Save.
-  3. Apri l'indirizzo https://TUO-UTENTE.github.io/NOME-REPO/
-  4. Per pubblicare gli aggiornamenti da dentro l'app: Impostazioni → Preset e GitHub
-     (serve un token "fine-grained" con permesso Contents: Read & write — guida inclusa nell'app).
+  3. Apri https://TUO-UTENTE.github.io/NOME-REPO/
+  4. Per aggiornare il team: importa/modifica nell'app → "Scarica preset.csv"
+     → carica il file nella repo su github.com sostituendo il precedente → Commit.
+     Gli altri PC ricevono l'aggiornamento automaticamente all'avvio.
 -->
 <html lang="it">
 <head>
@@ -230,17 +231,18 @@ label{font:600 12px var(--fb);color:var(--ink2);display:block;margin-bottom:6px;
 .btncol{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
 .btncol.row{flex-direction:row;flex-wrap:wrap}
 .filebtn{cursor:pointer}
-.ghgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0}
-.ghgrid .wide{grid-column:1/-1}
-.ghhelp{margin-top:14px;font-size:13.5px}
-.ghhelp summary{font:600 13.5px var(--fb);cursor:pointer;color:var(--teal-d)}
-.ghhelp ol{padding-left:20px;margin-top:10px;color:var(--ink2);line-height:1.7}
 .macrocard{margin-bottom:14px}
 .mhead{display:flex;gap:10px;align-items:center} .mhead b{font:700 16px var(--fd)} .mhead i{color:var(--teal)}
 .micros{margin-top:12px}
 .micro-row{border-top:1px solid #eef0f2}
 .micro-row>i:first-child{color:var(--ink2);font-size:13px}
 .lastbk{border-top:1px dashed var(--line);margin-top:16px;padding-top:12px}
+.ghsteps{margin:14px 0 4px;display:flex;flex-direction:column;gap:11px}
+.gstep{display:flex;gap:12px;align-items:flex-start;font-size:13.5px;line-height:1.55;color:var(--ink)}
+.gstep b{font-weight:700}
+.gstep .gn{width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;font:700 12px var(--fd);
+  display:inline-flex;align-items:center;justify-content:center;flex:none;margin-top:1px}
+.gstep.hl .gn{background:var(--teal)}
 
 /* ── conflitti / modal / toast ────────────── */
 .confl{display:flex;flex-direction:column;max-height:76vh}
@@ -273,7 +275,7 @@ label{font:600 12px var(--fb);color:var(--ink2);display:block;margin-bottom:6px;
   .shell{grid-template-columns:1fr}.side{position:static;height:auto;flex-direction:row;align-items:center;gap:14px;padding:12px 16px}
   .sidenav{margin:0;flex-direction:row}.side-foot{display:none}.brand-t{font-size:16px}
   .login{grid-template-columns:1fr}.l-left{padding:34px}
-  .prod2,.sync2,.frow2,.ghgrid{grid-template-columns:1fr}
+  .prod2,.sync2,.frow2{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -296,26 +298,23 @@ function fmtTs(t){if(!t)return '—';const d=new Date(t);return pad(d.getDate())
 function dataOdierna(){const s=new Date().toLocaleDateString('it-IT',{weekday:'long',day:'numeric',month:'long',year:'numeric'});return s[0].toUpperCase()+s.slice(1)}
 function codiceOperatore(op,d=new Date()){const iniz=((op.nome||'')[0]||'')+((op.cognome||'')[0]||'');return ('OP'+iniz+d.getDate()+pad(d.getMonth()+1)).toUpperCase()}
 function iniziali(op){return (((op.nome||'')[0]||'')+((op.cognome||'')[0]||'')).toUpperCase()||'?'}
-function b64enc(s){const b=new TextEncoder().encode(s);let bin='';for(let i=0;i<b.length;i++)bin+=String.fromCharCode(b[i]);return btoa(bin)}
 function download(name,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/csv;charset=utf-8'}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000)}
 function stamp(){const d=new Date();return d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'_'+pad(d.getHours())+pad(d.getMinutes())}
 async function copiaTxt(t){try{await navigator.clipboard.writeText(t)}catch(e){const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();document.execCommand('copy');x.remove()}}
 function toast(msg,icon){icon=icon||'check2-circle';const d=document.createElement('div');d.className='toast';d.innerHTML='<i class="bi bi-'+icon+'"></i><span>'+msg+'</span>';$('#toasts').appendChild(d);setTimeout(()=>d.classList.add('out'),3000);setTimeout(()=>d.remove(),3550)}
 
 /* ════════ dati ════════ */
-const LS_DB='goc_db_v1',LS_GH='goc_gh';
+const LS_DB='goc_db_v1';
 let db=null;
 let S={route:'wizard',op:null,w:null,tab:'operatori',prodSel:null,qEdit:null,qDraft:null,ghStatus:'off',confl:null,lastTxt:''};
 function saveDb(){localStorage.setItem(LS_DB,JSON.stringify(db))}
-function loadGh(){try{return JSON.parse(localStorage.getItem(LS_GH))||{}}catch(e){return{}}}
-function saveGhCfg(c){localStorage.setItem(LS_GH,JSON.stringify(c))}
 
 function opts(a){return a.map(v=>({id:uid(),valore:v,testoOut:''}))}
 function seed(){
   const ma1=uid(),ma2=uid(),mi1=uid(),mi2=uid(),mi3=uid();
   const D=o=>Object.assign({id:uid(),etichetta:'',obbligatoria:false,opzioni:[],conAltro:false,siTesto:'Sì',noMode:'salta',noTesto:'',unita:''},o);
   return {
-    meta:{versione:'2026-11-09 09:00',lastBackup:null,lastPull:null,lastPush:null},
+    meta:{versione:'2026-11-09 09:00',lastBackup:null,lastPull:null},
     operatori:[{id:uid(),nome:'Giuseppe',cognome:''},{id:uid(),nome:'Salvo',cognome:'Greco'}],
     macro:[{id:ma1,nome:'Stampa digitale'},{id:ma2,nome:'Grande formato'}],
     micro:[{id:mi1,nome:'Biglietti da visita',macroId:ma1},{id:mi2,nome:'Volantini e flyer',macroId:ma1},{id:mi3,nome:'Poster e manifesti',macroId:ma2}],
@@ -385,12 +384,12 @@ function csvToDb(text){
       else if(tipo==='MICRO')d.micro.push({id:r[1],macroId:r[2],nome:j.nome||''});
       else if(tipo==='PRODOTTO')d.prodotti.push({id:r[1],microId:r[2],codice:j.codice||'',nome:j.nome||'',domande:j.domande||[]});
     }
-    d.meta={versione:d.meta.versione||nowStr(),lastBackup:null,lastPull:null,lastPush:null};
+    d.meta={versione:d.meta.versione||nowStr(),lastBackup:null,lastPull:null};
     return d;
   }catch(e){return null}
 }
 
-/* ════════ GitHub ════════ */
+/* ════════ GitHub (solo lettura) ════════ */
 async function ghPull(manual){
   if(!/^https?:$/.test(location.protocol)){if(manual)toast('Apri l’app online (GitHub Pages) per scaricare i preset','info-circle');S.ghStatus='file';render();return}
   try{
@@ -405,29 +404,6 @@ async function ghPull(manual){
     }else{S.ghStatus='ok';if(manual)toast('Sei già aggiornato · versione '+db.meta.versione,'check2-circle')}
   }catch(e){S.ghStatus='err';if(manual)toast('Errore di rete: GitHub non raggiungibile','exclamation-triangle')}
   render();
-}
-async function ghPush(){
-  const c=loadGh();
-  if(!c.owner||!c.repo||!c.token){toast('Configura prima owner, repo e token in Impostazioni → Preset e GitHub','exclamation-triangle');S.tab='sync';S.route='settings';render();return false}
-  db.meta.versione=nowStr();saveDb();
-  const api='https://api.github.com/repos/'+c.owner+'/'+c.repo+'/contents/'+(c.path||'preset.csv');
-  const h={'Authorization':'Bearer '+c.token,'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'};
-  try{
-    let sha=null;
-    const g=await fetch(api+'?ref='+encodeURIComponent(c.branch||'main'),{headers:h});
-    if(g.ok)sha=(await g.json()).sha;
-    const body={message:'Aggiornamento preset · '+db.meta.versione,content:b64enc(dbToCsv(db)),branch:c.branch||'main'};
-    if(sha)body.sha=sha;
-    const r=await fetch(api,{method:'PUT',headers:Object.assign({'Content-Type':'application/json'},h),body:JSON.stringify(body)});
-    if(r.ok||r.status===201){db.meta.lastPush=Date.now();saveDb();toast('Pubblicato su GitHub: preset.csv sovrascritto ✓','cloud-arrow-up');render();return true}
-    const e=await r.json().catch(()=>({}));
-    toast('GitHub: '+(e.message||('errore '+r.status)),'exclamation-triangle');
-  }catch(err){toast('Errore di rete verso GitHub','exclamation-triangle')}
-  return false;
-}
-function saveGh(){
-  saveGhCfg({owner:$('#ghOwner').value.trim(),repo:$('#ghRepo').value.trim(),branch:$('#ghBranch').value.trim()||'main',path:$('#ghPath').value.trim()||'preset.csv',token:$('#ghToken').value.trim()});
-  toast('Configurazione GitHub salvata (solo in questo browser)','check2-circle');
 }
 
 /* ════════ merge / import ════════ */
@@ -444,9 +420,8 @@ function mergeDb(loc,inc,confl){
     const mi=inc.micro.find(m=>m.id===p.microId)||{};
     const ma=inc.macro.find(m=>m.id===mi.macroId)||{nome:'Generale'};
     const target=ensureMicro(ma.nome||'Generale',mi.nome||'Generale').id;
-    const ci=confl?confl.idx.get(p):-1;
-    if(ci===undefined||ci===-1||ci===undefined){}
-    if(ci==null||ci===-1){out.prodotti.push({id:uid(),codice:p.codice,nome:p.nome,microId:target,domande:clone(p.domande)})}
+    const ci=confl?confl.idx.get(p):undefined;
+    if(ci===undefined){out.prodotti.push({id:uid(),codice:p.codice,nome:p.nome,microId:target,domande:clone(p.domande)})}
     else if(confl.scelte[ci]==='inc'){const ex=out.prodotti.find(x=>norm(x.codice)===norm(p.codice));if(ex){ex.nome=p.nome;ex.domande=clone(p.domande);ex.microId=target}}
   }
   return out;
@@ -497,11 +472,10 @@ function applyMerge(replace){
   if(replace){const lb=db.meta.lastBackup;db=clone(inc);db.meta.lastBackup=lb}
   else db=mergeDb(db,inc,{idx:S.confl.idx,scelte:S.confl.scelte});
   db.meta.versione=nowStr();
-  const ghOk=!!loadGh().token;
   S.confl=null;S.w=null;saveDb();closeModal();render();
   toast('Import completato · nuova versione '+db.meta.versione,'upload');
-  if(ghOk)ask({title:'Aggiorna il team',icon:'github',msg:'Pubblico ora il nuovo <span class="mono">preset.csv</span> su GitHub? Così facendo il file viene sovrascritto e gli altri PC riceveranno l’aggiornamento alla prossima apertura.',ok:'Pubblica su GitHub'})
-    .then(ok=>{if(ok)ghPush()});
+  ask({title:'Aggiorna il team',icon:'cloud-arrow-up',msg:'Scarico subito il file <span class="mono">preset.csv</span> aggiornato: caricalo nella repository GitHub <b>al posto di quello vecchio</b> e gli altri PC riceveranno l’aggiornamento alla prossima apertura.',ok:'Scarica preset.csv'})
+  .then(ok=>{if(ok)exportPresetGh()});
 }
 
 /* ════════ export ════════ */
@@ -515,9 +489,15 @@ function exportMacro(){
   download('guida-ordini_'+norm(ma.nome).replace(/[^a-z0-9]+/g,'-')+'_'+stamp()+'.csv',dbToCsv(sub));
   toast('Categoria “'+esc(ma.nome)+'” esportata','download');render();
 }
+function exportPresetGh(){
+  db.meta.versione=nowStr();saveDb();
+  download('preset.csv',dbToCsv(db));
+  toast('preset.csv pronto · nuova versione '+db.meta.versione,'download');
+  render();
+}
 
 /* ════════ viste: login & shell ════════ */
-function go(r){S.route=r;if(r!=='settings'){}render()}
+function go(r){S.route=r;render()}
 function goLogin(){S.op=null;sessionStorage.removeItem('goc_op');S.route='wizard';render()}
 function goSettingsFree(){S.route='settings';render()}
 function pickOp(id){S.op=id;sessionStorage.setItem('goc_op',id);S.route='wizard';S.w=null;render()}
@@ -706,7 +686,7 @@ function nuovoOrdine(){S.w=null;render()}
 /* ════════ impostazioni ════════ */
 function setTab(t){S.tab=t;S.qEdit=null;S.qDraft=null;render()}
 function vSettings(){
-  const tabs=[['operatori','bi-people','Operatori'],['categorie','bi-diagram-3','Categorie'],['prodotti','bi-box-seam','Prodotti e domande'],['sync','bi-cloud-arrow-up','Preset e GitHub']];
+  const tabs=[['operatori','bi-people','Operatori'],['categorie','bi-diagram-3','Categorie'],['prodotti','bi-box-seam','Prodotti e domande'],['sync','bi-cloud-arrow-up','Preset e backup']];
   return '<div class="fade"><div class="phead"><div class="crumb">Area riservata</div><h1>Impostazioni</h1></div>'
    +'<div class="tabs">'+tabs.map(t=>'<button class="tab '+(S.tab===t[0]?'on':'')+'" onclick="setTab(\''+t[0]+'\')"><i class="bi '+t[1]+'"></i>'+t[2]+'</button>').join('')+'</div>'
    +(S.tab==='operatori'?tOperatori():S.tab==='categorie'?tCategorie():S.tab==='prodotti'?tProdotti():tSync())+'</div>';
@@ -901,38 +881,30 @@ function delQ(id){
   .then(ok=>{if(ok){const p=db.prodotti.find(x=>x.id===S.prodSel);p.domande=p.domande.filter(x=>x.id!==id);if(S.qEdit===id){S.qEdit=null;S.qDraft=null}saveDb();render()}});
 }
 
-/* — preset & github — */
+/* — preset & backup — */
 function tSync(){
-  const g=loadGh();
   const mopts=db.macro.map(m=>'<option value="'+m.id+'">'+esc(m.nome)+'</option>').join('');
-  return '<div class="sync2"><div class="card pad"><h3 class="sec" style="margin-top:0"><i class="bi bi-save"></i> Backup ed export</h3>'
+  return '<div class="sync2"><div class="card pad"><h3 class="sec" style="margin-top:0"><i class="bi bi-save"></i> Preset: importa ed esporta</h3>'
    +'<div class="verbox"><span class="mut">Versione preset attuale</span><b class="mono">'+esc(db.meta.versione||'—')+'</b></div>'
-   +'<div class="btncol"><button class="btn btn-pr" onclick="exportAll()"><i class="bi bi-download"></i> Esporta tutto (CSV)</button>'
+   +'<div class="btncol">'
+   +'<button class="btn btn-acc" onclick="exportPresetGh()"><i class="bi bi-github"></i> Scarica preset.csv (da caricare su GitHub)</button>'
+   +'<label class="btn btn-pr filebtn"><i class="bi bi-upload"></i> Importa file CSV<input type="file" accept=".csv,text/csv" hidden onchange="onImportFile(this)"></label>'
+   +'<button class="btn btn-gh" onclick="exportAll()"><i class="bi bi-download"></i> Backup completo (con data e ora)</button>'
    +'<div class="addrow thin" style="margin:0;width:100%"><select class="inp" id="expMacro">'+mopts+'</select>'
-   +'<button class="btn btn-gh" onclick="exportMacro()"><i class="bi bi-download"></i> Esporta categoria</button></div>'
-   +'<label class="btn btn-gh filebtn"><i class="bi bi-upload"></i> Importa file CSV<input type="file" accept=".csv,text/csv" hidden onchange="onImportFile(this)"></label></div>'
-   +'<p class="hint">L’export include operatori, categorie, prodotti e domande. Se all’import un prodotto ha già lo stesso codice, ti chiediamo quale conservare.</p>'
+   +'<button class="btn btn-gh" onclick="exportMacro()"><i class="bi bi-download"></i> Backup categoria</button></div></div>'
+   +'<p class="hint">Se all’import un prodotto ha già lo stesso codice, ti chiediamo quale conservare. Categoria e operatori nuovi vengono comunque aggiunti.</p>'
    +'<p class="hint lastbk"><i class="bi bi-clock-history"></i> Ultimo backup: <b>'+(db.meta.lastBackup?fmtTs(db.meta.lastBackup):'mai effettuato')+'</b>'
-   +(db.meta.lastPush?' · Ultima pubblicazione GitHub: <b>'+fmtTs(db.meta.lastPush)+'</b>':'')+'</p></div>'
-   +'<div class="card pad"><h3 class="sec" style="margin-top:0"><i class="bi bi-github"></i> GitHub · preset.csv</h3>'
-   +'<p class="hint" style="margin-top:0">Metti <span class="mono">index.html</span> e <span class="mono">preset.csv</span> nella stessa cartella della repository: ogni PC legge i preset da solo all’avvio. Con “Pubblica”, il file su GitHub viene <b>sovrascritto</b> e il team riceve l’aggiornamento.</p>'
-   +'<div class="ghgrid"><div class="frow"><label>Owner</label><input class="inp mono" id="ghOwner" value="'+esc(g.owner||'')+'" placeholder="utente-o-org"></div>'
-   +'<div class="frow"><label>Repository</label><input class="inp mono" id="ghRepo" value="'+esc(g.repo||'')+'" placeholder="nome-repo"></div>'
-   +'<div class="frow"><label>Branch</label><input class="inp mono" id="ghBranch" value="'+esc(g.branch||'main')+'"></div>'
-   +'<div class="frow"><label>Percorso file</label><input class="inp mono" id="ghPath" value="'+esc(g.path||'preset.csv')+'"></div>'
-   +'<div class="frow wide"><label>Token (fine-grained · Contents: Read and write)</label><input class="inp mono" type="password" id="ghToken" value="'+esc(g.token||'')+'" placeholder="github_pat_…"></div></div>'
-   +'<div class="btncol row"><button class="btn btn-gh" onclick="saveGh()"><i class="bi bi-check-lg"></i> Salva configurazione</button>'
-   +'<button class="btn btn-gh" onclick="ghPull(true)"><i class="bi bi-cloud-arrow-down"></i> Scarica da GitHub</button>'
-   +'<button class="btn btn-pr" onclick="ghPushAsk()"><i class="bi bi-cloud-arrow-up"></i> Pubblica su GitHub</button></div>'
-   +'<details class="ghhelp"><summary>Come creo il token?</summary><ol>'
-   +'<li>Su GitHub: <b>Settings → Developer settings → Fine-grained tokens → Generate new token</b>.</li>'
-   +'<li>Come “Repository access” seleziona <b>solo questa repository</b>.</li>'
-   +'<li>Permessi: <b>Contents → Read and write</b>. Nient’altro.</li>'
-   +'<li>Incolla il token qui sopra e salva. Viene memorizzato <b>solo in questo browser</b>.</li></ol></details></div></div>';
-}
-function ghPushAsk(){
-  ask({title:'Pubblica su GitHub',icon:'cloud-arrow-up',msg:'Il file <span class="mono">preset.csv</span> nella repository verrà <b>sovrascritto</b> con la configurazione attuale e la versione sarà aggiornata con data e ora. Continuare?',ok:'Pubblica'})
-  .then(ok=>{if(ok)ghPush()});
+   +(db.meta.lastPull?' · Ultimo scaricamento da GitHub: <b>'+fmtTs(db.meta.lastPull)+'</b>':'')+'</p></div>'
+   +'<div class="card pad"><h3 class="sec" style="margin-top:0"><i class="bi bi-github"></i> Aggiornamento del team</h3>'
+   +'<p class="hint" style="margin-top:0">Nessun server e nessun account: il file <span class="mono">preset.csv</span> vive nella repository insieme a <span class="mono">index.html</span>. Ogni PC lo legge da solo all’avvio.</p>'
+   +'<div class="ghsteps">'
+   +'<div class="gstep hl"><span class="gn">1</span><span><b>Modifica o importa</b> i preset qui nell’app.</span></div>'
+   +'<div class="gstep hl"><span class="gn">2</span><span>Premi <b>“Scarica preset.csv”</b>: il file esce già col nome giusto e la versione aggiornata.</span></div>'
+   +'<div class="gstep"><span class="gn">3</span><span>Apri la repository su <b>github.com → Add file → Upload files</b>, trascina il nuovo <span class="mono">preset.csv</span> e sostituisci il vecchio → <b>Commit</b>.</span></div>'
+   +'<div class="gstep"><span class="gn">4</span><span>Gli altri PC ricevono l’aggiornamento <b>all’apertura dell’app</b> (solo se la versione è più recente).</span></div>'
+   +'</div>'
+   +'<div class="btncol" style="margin-top:14px"><button class="btn btn-gh" onclick="ghPull(true)"><i class="bi bi-cloud-arrow-down"></i> Verifica / scarica ora da GitHub</button></div>'
+   +'<p class="hint">Suggerimento: fai sempre prima “Scarica preset.csv” e poi caricalo: così su GitHub c’è sempre la versione più nuova e i PC degli altri si aggiornano da soli.</p></div></div>';
 }
 
 /* ════════ modal & toast ════════ */
@@ -949,12 +921,12 @@ function ask(o){
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('#modal').classList.contains('on'))mDone(false)});
 
 /* ════════ avvio ════════ */
-window.addEventListener('DOMContentLoaded',async()=>{
+window.addEventListener('DOMContentLoaded',()=>{
   loadDb();
   const sop=sessionStorage.getItem('goc_op');
   if(sop&&db.operatori.find(o=>o.id===sop))S.op=sop;
   render();
-  await ghPull(false);
+  ghPull(false);
 });
 </script>
 </body>
