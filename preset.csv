@@ -1,15 +1,15 @@
-tipo;id;rif;ord;dati
-VERSIONE;;;;2026-11-09 12:08
-OPERATORE;xu0feznse;;0;"{""nome"":""Salvo"",""cognome"":""G""}"
-OPERATORE;xxbwakdwb;;1;"{""nome"":""Alberto"",""cognome"":""Plano""}"
-OPERATORE;xsl0ro867;;2;"{""nome"":""Samuele"",""cognome"":""Corradengo""}"
-OPERATORE;x9sbe8fqn;;3;"{""nome"":""Pietro"",""cognome"":""Donzelli""}"
-OPERATORE;x29et6cae;;4;"{""nome"":""Giuseppe"",""cognome"":""Pistone""}"
-OPERATORE;xp5iilhai;;5;"{""nome"":""Salvatore"",""cognome"":""Pistone""}"
-OPERATORE;xie6r58lf;;6;"{""nome"":""Alessio"",""cognome"":""Marciante""}"
-OPERATORE;xxjvdw20u;;7;"{""nome"":""Sara"",""cognome"":""Candela""}"
-MACRO;xe5w36ior;;0;"{""nome"":""Litografia""}"
-MACRO;xrc4crk00;;1;"{""nome"":""Abbigliamento""}"
-MACRO;xnrfkk61e;;2;"{""nome"":""Digitale""}"
-MACRO;x3tutujo4;;3;"{""nome"":""Plotter""}"
-MACRO;x6ymmw1k0;;4;"{""nome"":""Insegne""}"
+﻿tipo;id;rif;ord;dati
+VERSIONE;;;;2026-11-09 12:48
+OPERATORE;xu0feznse;;0;%7B%22nome%22%3A%22Salvo%22%2C%22cognome%22%3A%22G%22%2C%22emoji%22%3A%22%22%2C%22colore%22%3A%22%22%7D
+OPERATORE;xxbwakdwb;;1;%7B%22nome%22%3A%22Alberto%22%2C%22cognome%22%3A%22Plano%22%2C%22emoji%22%3A%22%22%2C%22colore%22%3A%22%22%7D
+OPERATORE;xsl0ro867;;2;%7B%22nome%22%3A%22Samuele%22%2C%22cognome%22%3A%22Corradengo%22%2C%22emoji%22%3A%22%22%2C%22colore%22%3A%22%22%7D
+OPERATORE;x9sbe8fqn;;3;%7B%22nome%22%3A%22Pietro%22%2C%22cognome%22%3A%22Donzelli%22%2C%22emoji%22%3A%22%22%2C%22colore%22%3A%22%22%7D
+OPERATORE;x29et6cae;;4;%7B%22nome%22%3A%22Giuseppe%22%2C%22cognome%22%3A%22Pistone%22%2C%22emoji%22%3A%22%22%2C%22colore%22%3A%22%22%7D
+OPERATORE;xp5iilhai;;5;%7B%22nome%22%3A%22Salvatore%22%2C%22cognome%22%3A%22Pistone%22%2C%22emoji%22%3A%22%22%2C%22colore%22%3A%22%22%7D
+OPERATORE;xie6r58lf;;6;%7B%22nome%22%3A%22Alessio%22%2C%22cognome%22%3A%22Marciante%22%2C%22emoji%22%3A%22%22%2C%22colore%22%3A%22%22%7D
+OPERATORE;xxjvdw20u;;7;%7B%22nome%22%3A%22Sara%22%2C%22cognome%22%3A%22Candela%22%2C%22emoji%22%3A%22%22%2C%22colore%22%3A%22%22%7D
+MACRO;xe5w36ior;;0;%7B%22nome%22%3A%22Litografia%22%2C%22colore%22%3A%22%239cdb85%22%7D
+MACRO;xrc4crk00;;1;%7B%22nome%22%3A%22Abbigliamento%22%2C%22colore%22%3A%22%23f480b8%22%7D
+MACRO;xnrfkk61e;;2;%7B%22nome%22%3A%22Digitale%22%2C%22colore%22%3A%22%2371aef4%22%7D
+MACRO;x3tutujo4;;3;%7B%22nome%22%3A%22Plotter%22%2C%22colore%22%3A%22%23f97b7b%22%7D
+MACRO;x6ymmw1k0;;4;%7B%22nome%22%3A%22Insegne%22%2C%22colore%22%3A%22%23ffc675%22%7D
