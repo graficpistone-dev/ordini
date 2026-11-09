@@ -1,5 +1,5 @@
 ﻿tipo;id;rif;ord;dati
-VERSIONE;;;;2026-11-09 12:48
+VERSIONE;;;;2026-11-09 15:24
 OPERATORE;xu0feznse;;0;%7B%22nome%22%3A%22Salvo%22%2C%22cognome%22%3A%22G%22%2C%22emoji%22%3A%22%22%2C%22colore%22%3A%22%22%7D
 OPERATORE;xxbwakdwb;;1;%7B%22nome%22%3A%22Alberto%22%2C%22cognome%22%3A%22Plano%22%2C%22emoji%22%3A%22%22%2C%22colore%22%3A%22%22%7D
 OPERATORE;xsl0ro867;;2;%7B%22nome%22%3A%22Samuele%22%2C%22cognome%22%3A%22Corradengo%22%2C%22emoji%22%3A%22%22%2C%22colore%22%3A%22%22%7D
@@ -13,3 +13,17 @@ MACRO;xrc4crk00;;1;%7B%22nome%22%3A%22Abbigliamento%22%2C%22colore%22%3A%22%23f4
 MACRO;xnrfkk61e;;2;%7B%22nome%22%3A%22Digitale%22%2C%22colore%22%3A%22%2371aef4%22%7D
 MACRO;x3tutujo4;;3;%7B%22nome%22%3A%22Plotter%22%2C%22colore%22%3A%22%23f97b7b%22%7D
 MACRO;x6ymmw1k0;;4;%7B%22nome%22%3A%22Insegne%22%2C%22colore%22%3A%22%23ffc675%22%7D
+MICRO;xge8yv8jk;xnrfkk61e;0;%7B%22nome%22%3A%22Bigliettini%20da%20visita%22%7D
+MICRO;xxl0lloa7;xnrfkk61e;1;%7B%22nome%22%3A%22Brochure%22%7D
+MICRO;x0s8dcg6q;xnrfkk61e;2;%7B%22nome%22%3A%22Pieghevoli%22%7D
+MICRO;xedym6hwl;xnrfkk61e;3;%7B%22nome%22%3A%22Locandine%22%7D
+MICRO;x29l198pi;xnrfkk61e;4;%7B%22nome%22%3A%22Timbri%22%7D
+MICRO;x3is86mq2;x3tutujo4;5;%7B%22nome%22%3A%22Banner%22%7D
+MICRO;x2uunf4pd;x3tutujo4;6;%7B%22nome%22%3A%22Roll-up%22%7D
+MICRO;xs4d4zgqn;x3tutujo4;7;%7B%22nome%22%3A%22PVC%22%7D
+MICRO;xv7ctny1x;x3tutujo4;8;%7B%22nome%22%3A%22Vinile%20Intaglio%22%7D
+MICRO;xf9rar0q5;x3tutujo4;9;%7B%22nome%22%3A%22Sabbiato%22%7D
+MICRO;xf9ee7zlj;x3tutujo4;10;%7B%22nome%22%3A%22Microforato%22%7D
+MICRO;x3wcouqlm;x3tutujo4;11;%7B%22nome%22%3A%22Pellicola%20Specchiata%22%7D
+MICRO;xerxcaail;x3tutujo4;12;%7B%22nome%22%3A%22Catarifrangente%22%7D
+MICRO;xtdgkz49f;x6ymmw1k0;13;%7B%22nome%22%3A%22Pannelli%20Dibond%22%7D
